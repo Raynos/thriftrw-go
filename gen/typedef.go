@@ -59,6 +59,7 @@ func typedef(g Generator, spec *compile.TypedefSpec) error {
 		<$fmt := import "fmt">
 		<$wire := import "go.uber.org/thriftrw/wire">
 		<$typedefType := typeReference .>
+		<$isLong := .IsLong >
 
 		type <typeName .> <typeName .Target>
 
@@ -68,6 +69,12 @@ func typedef(g Generator, spec *compile.TypedefSpec) error {
 			<$x> := (<typeReference .Target>)(<$v>)
 			return <toWire .Target $x>
 		}
+
+		<if $isLong>
+		func (<$v> <$typedefType>) MarshalJSON() {
+			return ""
+		}
+		<end>
 
 		func (<$v> <$typedefType>) String() string {
 			<$x> := (<typeReference .Target>)(<$v>)
