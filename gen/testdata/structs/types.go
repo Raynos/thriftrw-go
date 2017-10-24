@@ -1010,6 +1010,125 @@ func (v *Graph) Equals(rhs *Graph) bool {
 	return true
 }
 
+type JSONNumbers struct {
+	Time   Timestamp `json:"time"`
+	Long   Long      `json:"long"`
+	Number int64     `json:"number"`
+}
+
+func (v *JSONNumbers) ToWire() (wire.Value, error) {
+	var (
+		fields [3]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	w, err = v.Time.ToWire()
+	if err != nil {
+		return w, err
+	}
+	fields[i] = wire.Field{ID: 1, Value: w}
+	i++
+	w, err = v.Long.ToWire()
+	if err != nil {
+		return w, err
+	}
+	fields[i] = wire.Field{ID: 2, Value: w}
+	i++
+	w, err = wire.NewValueI64(v.Number), error(nil)
+	if err != nil {
+		return w, err
+	}
+	fields[i] = wire.Field{ID: 3, Value: w}
+	i++
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _Timestamp_Read(w wire.Value) (Timestamp, error) {
+	var x Timestamp
+	err := x.FromWire(w)
+	return x, err
+}
+
+func _Long_Read(w wire.Value) (Long, error) {
+	var x Long
+	err := x.FromWire(w)
+	return x, err
+}
+
+func (v *JSONNumbers) FromWire(w wire.Value) error {
+	var err error
+	timeIsSet := false
+	longIsSet := false
+	numberIsSet := false
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TI64 {
+				v.Time, err = _Timestamp_Read(field.Value)
+				if err != nil {
+					return err
+				}
+				timeIsSet = true
+			}
+		case 2:
+			if field.Value.Type() == wire.TI64 {
+				v.Long, err = _Long_Read(field.Value)
+				if err != nil {
+					return err
+				}
+				longIsSet = true
+			}
+		case 3:
+			if field.Value.Type() == wire.TI64 {
+				v.Number, err = field.Value.GetI64(), error(nil)
+				if err != nil {
+					return err
+				}
+				numberIsSet = true
+			}
+		}
+	}
+	if !timeIsSet {
+		return errors.New("field Time of JSONNumbers is required")
+	}
+	if !longIsSet {
+		return errors.New("field Long of JSONNumbers is required")
+	}
+	if !numberIsSet {
+		return errors.New("field Number of JSONNumbers is required")
+	}
+	return nil
+}
+
+func (v *JSONNumbers) String() string {
+	if v == nil {
+		return "<nil>"
+	}
+	var fields [3]string
+	i := 0
+	fields[i] = fmt.Sprintf("Time: %v", v.Time)
+	i++
+	fields[i] = fmt.Sprintf("Long: %v", v.Long)
+	i++
+	fields[i] = fmt.Sprintf("Number: %v", v.Number)
+	i++
+	return fmt.Sprintf("JSONNumbers{%v}", strings.Join(fields[:i], ", "))
+}
+
+func (v *JSONNumbers) Equals(rhs *JSONNumbers) bool {
+	if !(v.Time == rhs.Time) {
+		return false
+	}
+	if !(v.Long == rhs.Long) {
+		return false
+	}
+	if !(v.Number == rhs.Number) {
+		return false
+	}
+	return true
+}
+
 type List Node
 
 func (v *List) ToWire() (wire.Value, error) {
@@ -1028,6 +1147,32 @@ func (v *List) FromWire(w wire.Value) error {
 
 func (lhs *List) Equals(rhs *List) bool {
 	return (*Node)(lhs).Equals((*Node)(rhs))
+}
+
+type Long int64
+
+func (v Long) ToWire() (wire.Value, error) {
+	x := (int64)(v)
+	return wire.NewValueI64(x), error(nil)
+}
+
+func (v Long) MarshalJSON() {
+	return ""
+}
+
+func (v Long) String() string {
+	x := (int64)(v)
+	return fmt.Sprint(x)
+}
+
+func (v *Long) FromWire(w wire.Value) error {
+	x, err := w.GetI64(), error(nil)
+	*v = (Long)(x)
+	return err
+}
+
+func (lhs Long) Equals(rhs Long) bool {
+	return (lhs == rhs)
 }
 
 type Node struct {
@@ -1956,6 +2101,28 @@ func (v *Size) Equals(rhs *Size) bool {
 		return false
 	}
 	return true
+}
+
+type Timestamp int64
+
+func (v Timestamp) ToWire() (wire.Value, error) {
+	x := (int64)(v)
+	return wire.NewValueI64(x), error(nil)
+}
+
+func (v Timestamp) String() string {
+	x := (int64)(v)
+	return fmt.Sprint(x)
+}
+
+func (v *Timestamp) FromWire(w wire.Value) error {
+	x, err := w.GetI64(), error(nil)
+	*v = (Timestamp)(x)
+	return err
+}
+
+func (lhs Timestamp) Equals(rhs Timestamp) bool {
+	return (lhs == rhs)
 }
 
 type User struct {

@@ -84,6 +84,15 @@ struct Rename {
     2: required string camelCase (go.tag = 'json:"snake_case"')
 }
 
+typedef i64 Timestamp (json.type = "Date")
+typedef i64 Long  (json.type = "Long") 
+
+struct JSONNumbers {
+    1: required Timestamp time
+    2: required Long long
+    3: required i64 number
+}
+
 struct Omit {
     1: required string serialized
     2: required string hidden (go.tag = 'json:"-"')
